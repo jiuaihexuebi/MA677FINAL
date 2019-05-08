@@ -1,0 +1,114 @@
+---
+title: "MA677 FINAL PROJECT"
+author: "Kecheng Liang"
+date: "May 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+pacman::p_load(tidyverse,knitr,pwr,fitdistrplus)
+```
+
+#Statistics and the Law
+two sample t-test
+Null hypothesis: refuse rate of minority applicant is the same as that of white applicant  
+Alternative hypothesis: refuse rate of minority applicant is higher that of white applicant
+```{r}
+acorn<-read.csv("acorn.csv")
+test1 <- var.test(acorn$MIN,acorn$WHITE)
+test1
+test2 <- t.test(acorn$MIN, acorn$WHITE, alternative = "greater",var.equal = FALSE)
+test2
+```
+First, I did the F test to compare two variances. Since p-value = 0.02993, reject the null hypothesis, the two variances are not same. Then I did the two sample t-test. The result shows that the p-value = 2.979e-07, reject the null hypothesis. The refuse rate of minority applicant is higher that of white applicant.
+
+#Comparing Suppliers
+Chi-square test
+Null hypothesis: all three schools produces the same quality  
+Alternative hypothesis: at least one of these three schools produces different quality
+```{r}
+df <- matrix(c(12,8,21,23,12,30,89,62,119),nrow = 3,byrow = FALSE)
+colnames(df) <- c("Dead Bird","Display Art","Flying Art")
+rownames(df) <- c("Area 51","BDV","Giffen")
+chisq.test(df)
+```
+By doing the chi-square test, p-value = 0.8613 which is greater than 0.05. Therefore, we fail to reject the null hypothesis that all three schools produces the same quality.
+
+#How deadly are sharks?
+```{r}
+shark<-read.csv("sharkattack.csv")
+sharkdf <- shark %>% 
+            filter(Country == "United States" | Country == "Australia") %>%
+            filter(Type == "Provoked" | Type == "Unprovoked")
+table <- table(droplevels(sharkdf)$Country,droplevels(sharkdf)$Type)
+kable(prop.table(table,margin = 1))
+chisq.test(table)
+sharkdf2 <- shark %>% 
+            filter(Country == "United States" | Country == "Australia") %>%
+            filter(Fatal == "Y" | Fatal == "N")
+table2 <- table(droplevels(sharkdf2)$Country,droplevels(sharkdf2)$Fatal)
+kable(prop.table(table2,margin = 1))
+chisq.test(table2)
+pwr.chisq.test(w = ES.w2(prop.table(table2)), N=879+318+1795+217, df = 1, sig.level = 0.05)
+```
+I did 2 chi-square tests. The first one is try to compare the provoked and unprovoked between US and Australia. The result shows that p-value = 0.07907, and we do not reject the null hypothesis. Therefore, there is no association betweeen two variables. The p-value from second one is < 2.2e-16. Therefore, we reject the null hypothesis, there is association between fatal and country. The attack in Australia is much more deadly. The power is 1.
+
+#Power analysis
+In the book, it said that the hypothetical parameters of this binomial distribution doesn not provide a scale of equal units of detectability. Arcsin transformation could solve the problem that falling into one side of the range.symbol = 2 arcsin root(P).
+
+#Estimators
+
+
+#Rain in Southern Illinois
+```{r}
+ill60 <- read.table("ill-60.txt")
+year60<-as.numeric(as.array(ill60[,1]))
+ill61 <- read.table("ill-61.txt")
+year61<-as.numeric(as.array(ill61[,1]))
+ill62 <- read.table("ill-62.txt")
+year62<-as.numeric(as.array(ill62[,1]))
+ill63 <- read.table("ill-63.txt")
+year63<-as.numeric(as.array(ill63[,1]))
+ill64 <- read.table("ill-64.txt")
+year64<-as.numeric(as.array(ill64[,1]))
+plotdist(year60)
+plotdist(year61)
+plotdist(year62)
+plotdist(year63)
+plotdist(year64)
+#sum of year 60
+sum(year60)
+#sum of year 61
+sum(year61)
+#sum of year 62
+sum(year62)
+#sum of year 63
+sum(year63)
+#sum of year 64
+sum(year64)
+```
+Year 1961 is wetter based on the calculation for total amount of rainfall. However I cannot find any obvious different in those five distributions. Most of the rainfall are concentrated at the left side of data.
+
+```{r}
+years <- c(year60,year61,year62,year63,year64)
+gammadist <- fitdist(years, "gamma")
+plot(gammadist)
+summary(gammadist)
+```
+From the output, we can see that it fits well. Changnon and Huff are right about using gamma distribution.
+
+```{r}
+gamma2 <- fitdist(years, "gamma",method = "mme")
+gamma2d <- bootdist(gamma2)
+summary(gamma2d)
+
+gamma3 <- fitdist(years, "gamma",method = "mle")
+gamma3d <- bootdist(gamma3)
+summary(gamma3d)
+```
+Compare those two methods, mle has narrower CI. Therefore, I would choose mle as the estimator because it has the lower variance.
+
+#Decision theory
