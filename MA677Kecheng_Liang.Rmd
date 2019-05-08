@@ -60,6 +60,15 @@ I did 2 chi-square tests. The first one is try to compare the provoked and unpro
 In the book, it said that the hypothetical parameters of this binomial distribution doesn not provide a scale of equal units of detectability. Arcsin transformation could solve the problem that falling into one side of the range.symbol = 2 arcsin root(P).
 
 #Estimators
+##Exponential
+```{r,echo=FALSE, out.width = '100%'}
+knitr::include_graphics("Exponential.JPG")
+```
+
+##A new distribution
+```{r,echo=FALSE, out.width = '100%'}
+knitr::include_graphics("A new distribution.JPG")
+```
 
 
 #Rain in Southern Illinois
@@ -79,17 +88,12 @@ plotdist(year61)
 plotdist(year62)
 plotdist(year63)
 plotdist(year64)
-#sum of year 60
-sum(year60)
-#sum of year 61
-sum(year61)
-#sum of year 62
-sum(year62)
-#sum of year 63
-sum(year63)
-#sum of year 64
-sum(year64)
+year <- c(1960,1961,1962,1963,1964)
+total <- c(sum(year60),sum(year61),sum(year62),sum(year63),sum(year64))
+sum <- as.data.frame(cbind(year,total))
+kable(sum)
 ```
+
 Year 1961 is wetter based on the calculation for total amount of rainfall. However I cannot find any obvious different in those five distributions. Most of the rainfall are concentrated at the left side of data.
 
 ```{r}
@@ -112,3 +116,5 @@ summary(gamma3d)
 Compare those two methods, mle has narrower CI. Therefore, I would choose mle as the estimator because it has the lower variance.
 
 #Decision theory
+
+
